@@ -1,22 +1,22 @@
 <script>
- import SvelteIPFS from '/svelte-ipfs'
+ import Database from '$lib/Database.svelte'
 
- let ipfsNode
+ export let ipfs
 </script>
 
-<SvelteIPFS bind:ipfsNode />
+<Database bind:ipfs />
 
 <main>
     <h1>Hello!</h1>
-    {#if ipfsNode}
+    {#if ipfs}
 	<div>
-	    {#await ipfsNode.id()}
+	    {#await ipfs.id()}
 		Waiting node...
 	    {:then identity}
 		<p>
 		    Success!<br/>
 		    NodeId: { identity && identity.id }<br/>
-		    {#await ipfsNode.add("Hello world")}
+		    {#await ipfs.add("Hello world")}
 			Loading...
 		    {:then node}
 			CID: {node.cid}

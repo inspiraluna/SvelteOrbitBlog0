@@ -13,6 +13,10 @@
 	"devDependencies": {
 		"@sveltejs/adapter-auto": "next",
 		"@sveltejs/kit": "next",
+		"orbit-db": "^0.28.6",
+		"rollup-plugin-baked-env": "^1.0.0",
+		"rollup-plugin-node-globals": "^1.4.0",
+		"rollup-plugin-polyfill-node": "^0.9.0",
 		"svelte": "^3.44.0",
 		"svelte-check": "^2.7.1",
 		"typescript": "^4.7.2"
