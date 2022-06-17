@@ -1,0 +1,12 @@
+; DO NOT EDIT (unless you know what you are doing)
+;
+; This subdirectory is a git "subrepo", and this file is maintained by the
+; git-subrepo command. See https://github.com/git-commands/git-subrepo#readme
+;
+[subrepo]
+	remote = https://github.com/DougAnderson444/IPFS-Svelte-Component
+	branch = main
+	commit = 18a42cc09dc9d8208d8cacfc3fcda0287995ec2c
+	parent = 192f2b7899d0ec13bfa6e1a52907fd0ba57f4d11
+	method = merge
+	cmdver = 0.4.3
