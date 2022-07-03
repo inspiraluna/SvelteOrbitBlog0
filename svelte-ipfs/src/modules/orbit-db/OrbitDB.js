@@ -13817,11 +13817,11 @@ var require_ipfs_pubsub = __commonJS((exports2, module2) => {
         return;
       let content, subscription, topicId;
       topicId = message.topicIDs[0];
-     /* try {
-        content = JSON.parse(Buffer.from(message.data).toString());
-      } catch {
-        content = message.data;
-      }*/
+      try {
+       content = JSON.parse(Buffer.from(message.data).toString());
+      } catch(e) {
+       content = message.data;
+      }
       subscription = this._subscriptions[topicId];
       if (subscription && subscription.onMessage && content) {
         await subscription.onMessage(topicId, content, message.from);
