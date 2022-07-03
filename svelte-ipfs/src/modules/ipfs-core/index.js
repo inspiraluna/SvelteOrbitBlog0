@@ -18774,50 +18774,36 @@ var require_lib2 = __commonJS((exports2, module2) => {
 // node_modules/elliptic/package.json
 var require_package = __commonJS((exports2, module2) => {
   module2.exports = {
-    _from: "elliptic@6.5.4",
-    _id: "elliptic@6.5.4",
-    _inBundle: false,
-    _integrity: "sha512-iLhC6ULemrljPZb+QutR5TQGB+pdW6KGD5RSegS+8sorOZT+rdQFbsQFJgvN3eRqNALqJer4oQ16YvJHlU8hzQ==",
-    _location: "/elliptic",
-    _phantomChildren: {},
-    _requested: {
-      type: "version",
-      registry: true,
-      raw: "elliptic@6.5.4",
-      name: "elliptic",
-      escapedName: "elliptic",
-      rawSpec: "6.5.4",
-      saveSpec: null,
-      fetchSpec: "6.5.4"
-    },
-    _requiredBy: [
-      "/browserify-sign",
-      "/create-ecdh",
-      "/secp256k1"
+    name: "elliptic",
+    version: "6.5.4",
+    description: "EC cryptography",
+    main: "lib/elliptic.js",
+    files: [
+      "lib"
     ],
-    _resolved: "https://registry.npmjs.org/elliptic/-/elliptic-6.5.4.tgz",
-    _shasum: "da37cebd31e79a1367e941b592ed1fbebd58abbb",
-    _spec: "elliptic@6.5.4",
-    _where: "C:\\Users\\douga\\Documents2\\code\\IPFS-Svelte-Component\\node_modules\\browserify-sign",
-    author: {
-      name: "Fedor Indutny",
-      email: "fedor@indutny.com"
+    scripts: {
+      lint: "eslint lib test",
+      "lint:fix": "npm run lint -- --fix",
+      unit: "istanbul test _mocha --reporter=spec test/index.js",
+      test: "npm run lint && npm run unit",
+      version: "grunt dist && git add dist/"
     },
+    repository: {
+      type: "git",
+      url: "git@github.com:indutny/elliptic"
+    },
+    keywords: [
+      "EC",
+      "Elliptic",
+      "curve",
+      "Cryptography"
+    ],
+    author: "Fedor Indutny <fedor@indutny.com>",
+    license: "MIT",
     bugs: {
       url: "https://github.com/indutny/elliptic/issues"
     },
-    bundleDependencies: false,
-    dependencies: {
-      "bn.js": "^4.11.9",
-      brorand: "^1.1.0",
-      "hash.js": "^1.0.0",
-      "hmac-drbg": "^1.0.1",
-      inherits: "^2.0.4",
-      "minimalistic-assert": "^1.0.1",
-      "minimalistic-crypto-utils": "^1.0.1"
-    },
-    deprecated: false,
-    description: "EC cryptography",
+    homepage: "https://github.com/indutny/elliptic",
     devDependencies: {
       brfs: "^2.0.2",
       coveralls: "^3.1.0",
@@ -18833,31 +18819,15 @@ var require_package = __commonJS((exports2, module2) => {
       istanbul: "^0.4.5",
       mocha: "^8.0.1"
     },
-    files: [
-      "lib"
-    ],
-    homepage: "https://github.com/indutny/elliptic",
-    keywords: [
-      "EC",
-      "Elliptic",
-      "curve",
-      "Cryptography"
-    ],
-    license: "MIT",
-    main: "lib/elliptic.js",
-    name: "elliptic",
-    repository: {
-      type: "git",
-      url: "git+ssh://git@github.com/indutny/elliptic.git"
-    },
-    scripts: {
-      lint: "eslint lib test",
-      "lint:fix": "npm run lint -- --fix",
-      test: "npm run lint && npm run unit",
-      unit: "istanbul test _mocha --reporter=spec test/index.js",
-      version: "grunt dist && git add dist/"
-    },
-    version: "6.5.4"
+    dependencies: {
+      "bn.js": "^4.11.9",
+      brorand: "^1.1.0",
+      "hash.js": "^1.0.0",
+      "hmac-drbg": "^1.0.1",
+      inherits: "^2.0.4",
+      "minimalistic-assert": "^1.0.1",
+      "minimalistic-crypto-utils": "^1.0.1"
+    }
   };
 });
 
@@ -32513,22 +32483,11 @@ var require_index_browser2 = __commonJS((exports2) => {
     random: () => random,
     urlAlphabet: () => urlAlphabet
   });
-  if (process.env.NODE_ENV !== "production") {
-    if (typeof navigator !== "undefined" && navigator.product === "ReactNative" && typeof crypto === "undefined") {
-      throw new Error("React Native does not have a built-in secure random generator. If you don\u2019t need unpredictable IDs use `nanoid/non-secure`. For secure IDs, import `react-native-get-random-values` before Nano ID.");
-    }
-    if (typeof msCrypto !== "undefined" && typeof crypto === "undefined") {
-      throw new Error("Import file with `if (!window.crypto) window.crypto = window.msCrypto` before importing Nano ID to fix IE 11 support");
-    }
-    if (typeof crypto === "undefined") {
-      throw new Error("Your browser does not have secure random generator. If you don\u2019t need unpredictable IDs, you can use nanoid/non-secure.");
-    }
-  }
   var random = (bytes) => crypto.getRandomValues(new Uint8Array(bytes));
-  var customRandom = (alphabet, size, getRandom) => {
+  var customRandom = (alphabet, defaultSize, getRandom) => {
     let mask = (2 << Math.log(alphabet.length - 1) / Math.LN2) - 1;
-    let step = -~(1.6 * mask * size / alphabet.length);
-    return () => {
+    let step = -~(1.6 * mask * defaultSize / alphabet.length);
+    return (size = defaultSize) => {
       let id = "";
       while (true) {
         let bytes = getRandom(step);
@@ -32541,7 +32500,7 @@ var require_index_browser2 = __commonJS((exports2) => {
       }
     };
   };
-  var customAlphabet = (alphabet, size) => customRandom(alphabet, size, random);
+  var customAlphabet = (alphabet, size = 21) => customRandom(alphabet, size, random);
   var nanoid = (size = 21) => {
     let id = "";
     let bytes = crypto.getRandomValues(new Uint8Array(size));
@@ -33510,6 +33469,8 @@ var require_common3 = __commonJS((exports2, module2) => {
     function createDebug(namespace) {
       let prevTime;
       let enableOverride = null;
+      let namespacesCache;
+      let enabledCache;
       function debug(...args) {
         if (!debug.enabled) {
           return;
@@ -33552,7 +33513,16 @@ var require_common3 = __commonJS((exports2, module2) => {
       Object.defineProperty(debug, "enabled", {
         enumerable: true,
         configurable: false,
-        get: () => enableOverride === null ? createDebug.enabled(namespace) : enableOverride,
+        get: () => {
+          if (enableOverride !== null) {
+            return enableOverride;
+          }
+          if (namespacesCache !== createDebug.namespaces) {
+            namespacesCache = createDebug.namespaces;
+            enabledCache = createDebug.enabled(namespace);
+          }
+          return enabledCache;
+        },
         set: (v) => {
           enableOverride = v;
         }
@@ -33569,6 +33539,7 @@ var require_common3 = __commonJS((exports2, module2) => {
     }
     function enable(namespaces) {
       createDebug.save(namespaces);
+      createDebug.namespaces = namespaces;
       createDebug.names = [];
       createDebug.skips = [];
       let i;
@@ -33580,7 +33551,7 @@ var require_common3 = __commonJS((exports2, module2) => {
         }
         namespaces = split[i].replace(/\*/g, ".*?");
         if (namespaces[0] === "-") {
-          createDebug.skips.push(new RegExp("^" + namespaces.substr(1) + "$"));
+          createDebug.skips.push(new RegExp("^" + namespaces.slice(1) + "$"));
         } else {
           createDebug.names.push(new RegExp("^" + namespaces + "$"));
         }
@@ -40801,23 +40772,45 @@ var require_events = __commonJS((exports2, module2) => {
   }
   function once(emitter, name) {
     return new Promise(function(resolve, reject) {
-      function eventListener() {
-        if (errorListener !== void 0) {
+      function errorListener(err) {
+        emitter.removeListener(name, resolver);
+        reject(err);
+      }
+      function resolver() {
+        if (typeof emitter.removeListener === "function") {
           emitter.removeListener("error", errorListener);
         }
         resolve([].slice.call(arguments));
       }
       ;
-      var errorListener;
+      eventTargetAgnosticAddListener(emitter, name, resolver, {once: true});
       if (name !== "error") {
-        errorListener = function errorListener2(err) {
-          emitter.removeListener(name, eventListener);
-          reject(err);
-        };
-        emitter.once("error", errorListener);
+        addErrorHandlerIfEventEmitter(emitter, errorListener, {once: true});
       }
-      emitter.once(name, eventListener);
     });
+  }
+  function addErrorHandlerIfEventEmitter(emitter, handler, flags) {
+    if (typeof emitter.on === "function") {
+      eventTargetAgnosticAddListener(emitter, "error", handler, flags);
+    }
+  }
+  function eventTargetAgnosticAddListener(emitter, name, listener, flags) {
+    if (typeof emitter.on === "function") {
+      if (flags.once) {
+        emitter.once(name, listener);
+      } else {
+        emitter.on(name, listener);
+      }
+    } else if (typeof emitter.addEventListener === "function") {
+      emitter.addEventListener(name, function wrapListener(arg) {
+        if (flags.once) {
+          emitter.removeEventListener(name, wrapListener);
+        }
+        listener(arg);
+      });
+    } else {
+      throw new TypeError('The "emitter" argument must be of type EventEmitter. Received type ' + typeof emitter);
+    }
   }
 });
 
@@ -53211,115 +53204,27 @@ var require_get = __commonJS((exports2, module2) => {
 // node_modules/ipld-block/package.json
 var require_package2 = __commonJS((exports2, module2) => {
   module2.exports = {
-    _from: "ipld-block@^0.11.0",
-    _id: "ipld-block@0.11.1",
-    _inBundle: false,
-    _integrity: "sha512-sDqqLqD5qh4QzGq6ssxLHUCnH4emCf/8F8IwjQM2cjEEIEHMUj57XhNYgmGbemdYPznUhffxFGEHsruh5+HQRw==",
-    _location: "/ipld-block",
-    _phantomChildren: {},
-    _requested: {
-      type: "range",
-      registry: true,
-      raw: "ipld-block@^0.11.0",
-      name: "ipld-block",
-      escapedName: "ipld-block",
-      rawSpec: "^0.11.0",
-      saveSpec: null,
-      fetchSpec: "^0.11.0"
-    },
-    _requiredBy: [
-      "/ipfs-bitswap",
-      "/ipfs-core",
-      "/ipfs-repo",
-      "/ipld"
-    ],
-    _resolved: "https://registry.npmjs.org/ipld-block/-/ipld-block-0.11.1.tgz",
-    _shasum: "c3a7b41aee3244187bd87a73f980e3565d299b6e",
-    _spec: "ipld-block@^0.11.0",
-    _where: "C:\\Users\\douga\\Documents2\\code\\IPFS-Svelte-Component\\node_modules\\ipfs-core",
-    bugs: {
-      url: "https://github.com/ipld/js-ipld-block/issues"
-    },
-    bundleDependencies: false,
-    contributors: [
-      {
-        name: "David Dias",
-        email: "daviddias.p@gmail.com"
-      },
-      {
-        name: "Volker Mische",
-        email: "volker.mische@gmail.com"
-      },
-      {
-        name: "Friedel Ziegelmayer",
-        email: "dignifiedquire@gmail.com"
-      },
-      {
-        name: "Irakli Gozalishvili",
-        email: "contact@gozala.io"
-      },
-      {
-        name: "achingbrain",
-        email: "alex@achingbrain.net"
-      },
-      {
-        name: "\u1D20\u026A\u1D04\u1D1B\u1D0F\u0280 \u0299\u1D0A\u1D07\u029F\u1D0B\u029C\u1D0F\u029F\u1D0D",
-        email: "victorbjelkholm@gmail.com"
-      },
-      {
-        name: "Alan Shaw",
-        email: "alan.shaw@protocol.ai"
-      },
-      {
-        name: "Charlie",
-        email: "the_charlie_daly@hotmail.co.uk"
-      },
-      {
-        name: "Diogo Silva",
-        email: "fsdiogo@gmail.com"
-      },
-      {
-        name: "Hugo Dias",
-        email: "hugomrdias@gmail.com"
-      },
-      {
-        name: "Mikeal Rogers",
-        email: "mikeal.rogers@gmail.com"
-      },
-      {
-        name: "Richard Littauer",
-        email: "richard.littauer@gmail.com"
-      },
-      {
-        name: "Richard Schneider",
-        email: "makaretu@gmail.com"
-      },
-      {
-        name: "Xmader",
-        email: "xmader@outlook.com"
-      }
-    ],
-    dependencies: {
-      cids: "^1.0.0"
-    },
-    deprecated: false,
-    description: "JavaScript Implementation of IPLD Block",
-    devDependencies: {
-      aegir: "^31.0.4",
-      uint8arrays: "^2.1.3"
-    },
-    engines: {
-      node: ">=6.0.0",
-      npm: ">=3.0.0"
-    },
-    homepage: "https://github.com/ipld/js-ipld-block#readme",
-    keywords: [
-      "IPLD"
-    ],
-    leadMaintainer: "Volker Mische <volker.mische@gmail.com>",
-    license: "MIT",
-    main: "src/index.js",
     name: "ipld-block",
+    version: "0.11.1",
+    description: "JavaScript Implementation of IPLD Block",
+    leadMaintainer: "Volker Mische <volker.mische@gmail.com>",
+    main: "src/index.js",
+    types: "dist/src/index.d.ts",
+    scripts: {
+      lint: "aegir lint",
+      check: "tsc --noEmit --noErrorTruncation",
+      test: "aegir test",
+      "test:node": "aegir test --target node",
+      "test:browser": "aegir test --target browser",
+      release: "aegir release --docs",
+      "release-minor": "aegir release --type minor --docs",
+      "release-major": "aegir release --type major --docs",
+      coverage: "aegir coverage",
+      "coverage-publish": "aegir coverage --provider coveralls",
+      docs: "aegir docs",
+      prepare: "aegir build --no-bundle",
+      prepublishOnly: "aegir build"
+    },
     "pre-push": [
       "lint",
       "test"
@@ -53328,23 +53233,41 @@ var require_package2 = __commonJS((exports2, module2) => {
       type: "git",
       url: "git+https://github.com/ipld/js-ipld-block.git"
     },
-    scripts: {
-      check: "tsc --noEmit --noErrorTruncation",
-      coverage: "aegir coverage",
-      "coverage-publish": "aegir coverage --provider coveralls",
-      docs: "aegir docs",
-      lint: "aegir lint",
-      prepare: "aegir build --no-bundle",
-      prepublishOnly: "aegir build",
-      release: "aegir release --docs",
-      "release-major": "aegir release --type major --docs",
-      "release-minor": "aegir release --type minor --docs",
-      test: "aegir test",
-      "test:browser": "aegir test --target browser",
-      "test:node": "aegir test --target node"
+    keywords: [
+      "IPLD"
+    ],
+    license: "MIT",
+    bugs: {
+      url: "https://github.com/ipld/js-ipld-block/issues"
     },
-    types: "dist/src/index.d.ts",
-    version: "0.11.1"
+    homepage: "https://github.com/ipld/js-ipld-block#readme",
+    devDependencies: {
+      aegir: "^31.0.4",
+      uint8arrays: "^2.1.3"
+    },
+    dependencies: {
+      cids: "^1.0.0"
+    },
+    engines: {
+      node: ">=6.0.0",
+      npm: ">=3.0.0"
+    },
+    contributors: [
+      "David Dias <daviddias.p@gmail.com>",
+      "Volker Mische <volker.mische@gmail.com>",
+      "Friedel Ziegelmayer <dignifiedquire@gmail.com>",
+      "Irakli Gozalishvili <contact@gozala.io>",
+      "achingbrain <alex@achingbrain.net>",
+      "\u1D20\u026A\u1D04\u1D1B\u1D0F\u0280 \u0299\u1D0A\u1D07\u029F\u1D0B\u029C\u1D0F\u029F\u1D0D <victorbjelkholm@gmail.com>",
+      "Alan Shaw <alan.shaw@protocol.ai>",
+      "Charlie <the_charlie_daly@hotmail.co.uk>",
+      "Diogo Silva <fsdiogo@gmail.com>",
+      "Hugo Dias <hugomrdias@gmail.com>",
+      "Mikeal Rogers <mikeal.rogers@gmail.com>",
+      "Richard Littauer <richard.littauer@gmail.com>",
+      "Richard Schneider <makaretu@gmail.com>",
+      "Xmader <xmader@outlook.com>"
+    ]
   };
 });
 
@@ -57962,29 +57885,21 @@ var require_root = __commonJS((exports2, module2) => {
 // node_modules/ipfs-core/package.json
 var require_package3 = __commonJS((exports2, module2) => {
   module2.exports = {
-    _from: "ipfs-core@^0.5.4",
-    _id: "ipfs-core@0.5.4",
-    _inBundle: false,
-    _integrity: "sha512-gyv3slu7FuaN1wxfDPhNoWiTSvUJ1pq0Nx2NsU3WWzOvKCaacHtE8HXO51AAuQUMUEN0thYGzVHziHGLI9udNQ==",
-    _location: "/ipfs-core",
-    _phantomChildren: {},
-    _requested: {
-      type: "range",
-      registry: true,
-      raw: "ipfs-core@^0.5.4",
-      name: "ipfs-core",
-      escapedName: "ipfs-core",
-      rawSpec: "^0.5.4",
-      saveSpec: null,
-      fetchSpec: "^0.5.4"
-    },
-    _requiredBy: [
-      "/"
+    name: "ipfs-core",
+    version: "0.5.4",
+    description: "JavaScript implementation of the IPFS specification",
+    keywords: [
+      "IPFS"
     ],
-    _resolved: "https://registry.npmjs.org/ipfs-core/-/ipfs-core-0.5.4.tgz",
-    _shasum: "d08d9e581554dd34e7f1124725c19be1faffb381",
-    _spec: "ipfs-core@^0.5.4",
-    _where: "C:\\Users\\douga\\Documents2\\code\\IPFS-Svelte-Component",
+    homepage: "https://github.com/ipfs/js-ipfs/tree/master/packages/ipfs-core#readme",
+    bugs: "https://github.com/ipfs/js-ipfs/issues",
+    license: "(Apache-2.0 OR MIT)",
+    leadMaintainer: "Alex Potsides <alex@achingbrain.net>",
+    main: "src/index.js",
+    files: [
+      "src",
+      "dist"
+    ],
     browser: {
       "./src/runtime/init-assets-nodejs.js": "./src/runtime/init-assets-browser.js",
       "./src/runtime/config-nodejs.js": "./src/runtime/config-browser.js",
@@ -57996,10 +57911,33 @@ var require_package3 = __commonJS((exports2, module2) => {
       "./test/utils/create-repo-nodejs.js": "./test/utils/create-repo-browser.js",
       "ipfs-utils/src/files/glob-source": false
     },
-    bugs: {
-      url: "https://github.com/ipfs/js-ipfs/issues"
+    typesVersions: {
+      "*": {
+        "*": [
+          "dist/*",
+          "dist/*/index"
+        ]
+      }
     },
-    bundleDependencies: false,
+    repository: {
+      type: "git",
+      url: "git+https://github.com/ipfs/js-ipfs.git"
+    },
+    scripts: {
+      prepare: "npm run build",
+      build: "aegir build",
+      lint: "aegir lint",
+      test: "aegir test",
+      "test:node": "aegir test -t node",
+      "test:browser": "aegir test -t browser",
+      "test:webworker": "aegir test -t webworker",
+      "test:electron-main": "aegir test -t electron-main",
+      "test:electron-renderer": "aegir test -t electron-renderer",
+      "test:bootstrapers": "IPFS_TEST=bootstrapers aegir test -t browser -f test/bootstrapers.js",
+      coverage: "nyc --reporter=text --reporter=lcov npm run test:node",
+      clean: "rimraf ./dist",
+      "dep-check": "aegir dep-check -i interface-ipfs-core -i ipfs-core-types -i abort-controller"
+    },
     dependencies: {
       "abort-controller": "^3.0.0",
       "array-shuffle": "^2.0.0",
@@ -58065,8 +58003,6 @@ var require_package3 = __commonJS((exports2, module2) => {
       "streaming-iterables": "^5.0.2",
       uint8arrays: "^2.1.3"
     },
-    deprecated: false,
-    description: "JavaScript implementation of the IPFS specification",
     devDependencies: {
       aegir: "^31.0.0",
       delay: "^4.4.0",
@@ -58079,47 +58015,7 @@ var require_package3 = __commonJS((exports2, module2) => {
       rimraf: "^3.0.2",
       sinon: "^9.0.3"
     },
-    files: [
-      "src",
-      "dist"
-    ],
-    gitHead: "511147bedd51be3151de44a90fefe9425bfbcd50",
-    homepage: "https://github.com/ipfs/js-ipfs/tree/master/packages/ipfs-core#readme",
-    keywords: [
-      "IPFS"
-    ],
-    leadMaintainer: "Alex Potsides <alex@achingbrain.net>",
-    license: "(Apache-2.0 OR MIT)",
-    main: "src/index.js",
-    name: "ipfs-core",
-    repository: {
-      type: "git",
-      url: "git+https://github.com/ipfs/js-ipfs.git"
-    },
-    scripts: {
-      build: "aegir build",
-      clean: "rimraf ./dist",
-      coverage: "nyc --reporter=text --reporter=lcov npm run test:node",
-      "dep-check": "aegir dep-check -i interface-ipfs-core -i ipfs-core-types -i abort-controller",
-      lint: "aegir lint",
-      prepare: "npm run build",
-      test: "aegir test",
-      "test:bootstrapers": "IPFS_TEST=bootstrapers aegir test -t browser -f test/bootstrapers.js",
-      "test:browser": "aegir test -t browser",
-      "test:electron-main": "aegir test -t electron-main",
-      "test:electron-renderer": "aegir test -t electron-renderer",
-      "test:node": "aegir test -t node",
-      "test:webworker": "aegir test -t webworker"
-    },
-    typesVersions: {
-      "*": {
-        "*": [
-          "dist/*",
-          "dist/*/index"
-        ]
-      }
-    },
-    version: "0.5.4"
+    gitHead: "511147bedd51be3151de44a90fefe9425bfbcd50"
   };
 });
 
@@ -78495,87 +78391,23 @@ var require_receptacle = __commonJS((exports2, module2) => {
   };
 });
 
-// node_modules/globalthis/implementation.browser.js
-var require_implementation_browser = __commonJS((exports2, module2) => {
-  "use strict";
-  if (typeof self !== "undefined") {
-    module2.exports = self;
-  } else if (typeof window !== "undefined") {
-    module2.exports = window;
-  } else {
-    module2.exports = Function("return this")();
-  }
-});
-
-// node_modules/globalthis/polyfill.js
-var require_polyfill3 = __commonJS((exports2, module2) => {
-  "use strict";
-  var implementation = require_implementation_browser();
-  module2.exports = function getPolyfill() {
-    if (typeof global !== "object" || !global || global.Math !== Math || global.Array !== Array) {
-      return implementation;
-    }
-    return global;
-  };
-});
-
-// node_modules/globalthis/shim.js
-var require_shim3 = __commonJS((exports2, module2) => {
-  "use strict";
-  var define2 = require_define_properties();
-  var getPolyfill = require_polyfill3();
-  module2.exports = function shimGlobal() {
-    var polyfill = getPolyfill();
-    if (define2.supportsDescriptors) {
-      var descriptor = Object.getOwnPropertyDescriptor(polyfill, "globalThis");
-      if (!descriptor || descriptor.configurable && (descriptor.enumerable || descriptor.writable || globalThis !== polyfill)) {
-        Object.defineProperty(polyfill, "globalThis", {
-          configurable: true,
-          enumerable: false,
-          value: polyfill,
-          writable: false
-        });
-      }
-    } else if (typeof globalThis !== "object" || globalThis !== polyfill) {
-      polyfill.globalThis = polyfill;
-    }
-    return polyfill;
-  };
-});
-
-// node_modules/globalthis/index.js
-var require_globalthis2 = __commonJS((exports2, module2) => {
-  "use strict";
-  var defineProperties = require_define_properties();
-  var implementation = require_implementation_browser();
-  var getPolyfill = require_polyfill3();
-  var shim = require_shim3();
-  var polyfill = getPolyfill();
-  var getGlobal = function() {
-    return polyfill;
-  };
-  defineProperties(getGlobal, {
-    getPolyfill,
-    implementation,
-    shim
-  });
-  module2.exports = getGlobal;
-});
-
-// node_modules/native-fetch/src/index.js
+// node_modules/dns-over-http-resolver/node_modules/native-fetch/src/index.js
 var require_src58 = __commonJS((exports2, module2) => {
   "use strict";
-  var globalThis2 = require_globalthis2()();
-  if (globalThis2.fetch && globalThis2.Headers && globalThis2.Request && globalThis2.Response) {
-    module2.exports = function fetch(...args) {
-      return globalThis2.fetch(...args);
+  if (globalThis.fetch && globalThis.Headers && globalThis.Request && globalThis.Response) {
+    module2.exports = {
+      default: globalThis.fetch,
+      Headers: globalThis.Headers,
+      Request: globalThis.Request,
+      Response: globalThis.Response
     };
-    module2.exports.Headers = globalThis2.Headers;
-    module2.exports.Request = globalThis2.Request;
-    module2.exports.Response = globalThis2.Response;
-    module2.exports.default = module2.exports;
   } else {
-    module2.exports = require_browser2();
+    module2.exports = {
+      default: require_browser2().default,
+      Headers: require_browser2().Headers,
+      Request: require_browser2().Request,
+      Response: require_browser2().Response
+    };
   }
 });
 
@@ -78586,7 +78418,6 @@ var require_utils26 = __commonJS((exports2, module2) => {
   function buildResource({serverResolver, hostname, recordType}) {
     return `${serverResolver}?name=${hostname}&type=${recordType}`;
   }
-  module2.exports.buildResource = buildResource;
   function fetch(resource) {
     return nativeFetch(resource, {
       headers: new Headers({
@@ -78594,11 +78425,14 @@ var require_utils26 = __commonJS((exports2, module2) => {
       })
     });
   }
-  module2.exports.fetch = fetch;
   function getCacheKey(hostname, recordType) {
     return `${recordType}_${hostname}`;
   }
-  module2.exports.getCacheKey = getCacheKey;
+  module2.exports = {
+    buildResource,
+    fetch,
+    getCacheKey
+  };
 });
 
 // node_modules/dns-over-http-resolver/src/index.js
@@ -78608,11 +78442,7 @@ var require_src59 = __commonJS((exports2, module2) => {
   var log = debug("dns-over-http-resolver");
   log.error = debug("dns-over-http-resolver:error");
   var Receptacle = require_receptacle();
-  var {
-    buildResource,
-    fetch,
-    getCacheKey
-  } = require_utils26();
+  var utils = require_utils26();
   var Resolver = class {
     constructor({maxCache = 100} = {}) {
       this._cache = new Receptacle({max: maxCache});
@@ -78651,13 +78481,13 @@ var require_src59 = __commonJS((exports2, module2) => {
     }
     async resolve4(hostname) {
       const recordType = "A";
-      const cached = this._cache.get(getCacheKey(hostname, recordType));
+      const cached = this._cache.get(utils.getCacheKey(hostname, recordType));
       if (cached) {
         return cached;
       }
       for (const server of this._getShuffledServers()) {
         try {
-          const response = await fetch(buildResource({
+          const response = await utils.fetch(utils.buildResource({
             serverResolver: server,
             hostname,
             recordType
@@ -78665,7 +78495,7 @@ var require_src59 = __commonJS((exports2, module2) => {
           const d = await response.json();
           const data = d.Answer.map((a) => a.data);
           const ttl = Math.min(d.Answer.map((a) => a.TTL));
-          this._cache.set(getCacheKey(hostname, recordType), data, {ttl});
+          this._cache.set(utils.getCacheKey(hostname, recordType), data, {ttl});
           return data;
         } catch (err) {
           log.error(`${server} could not resolve ${hostname} record ${recordType}`);
@@ -78675,13 +78505,13 @@ var require_src59 = __commonJS((exports2, module2) => {
     }
     async resolve6(hostname) {
       const recordType = "AAAA";
-      const cached = this._cache.get(getCacheKey(hostname, recordType));
+      const cached = this._cache.get(utils.getCacheKey(hostname, recordType));
       if (cached) {
         return cached;
       }
       for (const server of this._getShuffledServers()) {
         try {
-          const response = await fetch(buildResource({
+          const response = await utils.fetch(utils.buildResource({
             serverResolver: server,
             hostname,
             recordType
@@ -78689,7 +78519,7 @@ var require_src59 = __commonJS((exports2, module2) => {
           const d = await response.json();
           const data = d.Answer.map((a) => a.data);
           const ttl = Math.min(d.Answer.map((a) => a.TTL));
-          this._cache.set(getCacheKey(hostname, recordType), data, {ttl});
+          this._cache.set(utils.getCacheKey(hostname, recordType), data, {ttl});
           return data;
         } catch (err) {
           log.error(`${server} could not resolve ${hostname} record ${recordType}`);
@@ -78699,13 +78529,13 @@ var require_src59 = __commonJS((exports2, module2) => {
     }
     async resolveTxt(hostname) {
       const recordType = "TXT";
-      const cached = this._cache.get(getCacheKey(hostname, recordType));
+      const cached = this._cache.get(utils.getCacheKey(hostname, recordType));
       if (cached) {
         return cached;
       }
       for (const server of this._getShuffledServers()) {
         try {
-          const response = await fetch(buildResource({
+          const response = await utils.fetch(utils.buildResource({
             serverResolver: server,
             hostname,
             recordType
@@ -78713,7 +78543,7 @@ var require_src59 = __commonJS((exports2, module2) => {
           const d = await response.json();
           const data = d.Answer.map((a) => [a.data.replace(/['"]+/g, "")]);
           const ttl = Math.min(d.Answer.map((a) => a.TTL));
-          this._cache.set(getCacheKey(hostname, recordType), data, {ttl});
+          this._cache.set(utils.getCacheKey(hostname, recordType), data, {ttl});
           return data;
         } catch (err) {
           log.error(`${server} could not resolve ${hostname} record ${recordType}`);
@@ -78787,257 +78617,60 @@ var require_constants34 = __commonJS((exports2, module2) => {
 // node_modules/libp2p/package.json
 var require_package4 = __commonJS((exports2, module2) => {
   module2.exports = {
-    _from: "libp2p@^0.30.7",
-    _id: "libp2p@0.30.12",
-    _inBundle: false,
-    _integrity: "sha512-ka3SYozbUH3LD/JZ0Zo5b2NDPp8vDHNd4/E1mIundArWo8/KKiPAOk5ELwWwRHwtu41fAQXvWydlQwPgy9ijZg==",
-    _location: "/libp2p",
-    _phantomChildren: {
-      "@multiformats/base-x": "4.0.1",
-      "web-encoding": "1.1.2"
+    name: "libp2p",
+    version: "0.30.12",
+    description: "JavaScript implementation of libp2p, a modular peer to peer network stack",
+    leadMaintainer: "Jacob Heun <jacobheun@gmail.com>",
+    main: "src/index.js",
+    types: "dist/src/index.d.ts",
+    typesVersions: {
+      "*": {
+        "src/*": [
+          "dist/src/*",
+          "dist/src/*/index"
+        ]
+      }
     },
-    _requested: {
-      type: "range",
-      registry: true,
-      raw: "libp2p@^0.30.7",
-      name: "libp2p",
-      escapedName: "libp2p",
-      rawSpec: "^0.30.7",
-      saveSpec: null,
-      fetchSpec: "^0.30.7"
-    },
-    _requiredBy: [
-      "/ipfs-core"
+    files: [
+      "dist",
+      "src"
     ],
-    _resolved: "https://registry.npmjs.org/libp2p/-/libp2p-0.30.12.tgz",
-    _shasum: "89cd72df71781649777e3a40691c47743bda8627",
-    _spec: "libp2p@^0.30.7",
-    _where: "C:\\Users\\douga\\Documents2\\code\\IPFS-Svelte-Component\\node_modules\\ipfs-core",
-    browser: {
-      "@motrix/nat-api": false
+    scripts: {
+      lint: "aegir lint",
+      build: "aegir build",
+      test: "npm run test:node && npm run test:browser",
+      "test:node": 'aegir test -t node -f "./test/**/*.{node,spec}.js"',
+      "test:browser": "aegir test -t browser",
+      "test:examples": "cd examples && npm run test:all",
+      release: "aegir release -t node -t browser",
+      "release-minor": "aegir release --type minor -t node -t browser",
+      "release-major": "aegir release --type major -t node -t browser",
+      coverage: "nyc --reporter=text --reporter=lcov npm run test:node"
     },
+    repository: {
+      type: "git",
+      url: "https://github.com/libp2p/js-libp2p.git"
+    },
+    keywords: [
+      "libp2p",
+      "network",
+      "p2p",
+      "peer",
+      "peer-to-peer",
+      "IPFS"
+    ],
     bugs: {
       url: "https://github.com/libp2p/js-libp2p/issues"
     },
-    bundleDependencies: false,
-    contributors: [
-      {
-        name: "David Dias",
-        email: "daviddias.p@gmail.com"
-      },
-      {
-        name: "Jacob Heun",
-        email: "jacobheun@gmail.com"
-      },
-      {
-        name: "Vasco Santos",
-        email: "vasco.santos@moxy.studio"
-      },
-      {
-        name: "Alan Shaw",
-        email: "alan@tableflip.io"
-      },
-      {
-        name: "Alex Potsides",
-        email: "alex@achingbrain.net"
-      },
-      {
-        name: "Cayman",
-        email: "caymannava@gmail.com"
-      },
-      {
-        name: "Pedro Teixeira",
-        email: "i@pgte.me"
-      },
-      {
-        name: "Friedel Ziegelmayer",
-        email: "dignifiedquire@gmail.com"
-      },
-      {
-        name: "Maciej Kr\xFCger",
-        email: "mkg20001@gmail.com"
-      },
-      {
-        name: "Hugo Dias",
-        email: "mail@hugodias.me"
-      },
-      {
-        name: "Volker Mische",
-        email: "volker.mische@gmail.com"
-      },
-      {
-        name: "dirkmc",
-        email: "dirkmdev@gmail.com"
-      },
-      {
-        name: "Richard Littauer",
-        email: "richard.littauer@gmail.com"
-      },
-      {
-        name: "a1300",
-        email: "matthias-knopp@gmx.net"
-      },
-      {
-        name: "Elven",
-        email: "mon.samuel@qq.com"
-      },
-      {
-        name: "Andrew Nesbitt",
-        email: "andrewnez@gmail.com"
-      },
-      {
-        name: "\u1D20\u026A\u1D04\u1D1B\u1D0F\u0280 \u0299\u1D0A\u1D07\u029F\u1D0B\u029C\u1D0F\u029F\u1D0D",
-        email: "victorbjelkholm@gmail.com"
-      },
-      {
-        name: "Giovanni T. Parra",
-        email: "fiatjaf@gmail.com"
-      },
-      {
-        name: "Ryan Bell",
-        email: "ryan@piing.net"
-      },
-      {
-        name: "Thomas Eizinger",
-        email: "thomas@eizinger.io"
-      },
-      {
-        name: "Samlior",
-        email: "samlior@foxmail.com"
-      },
-      {
-        name: "Didrik Nordstr\xF6m",
-        email: "didrik@betamos.se"
-      },
-      {
-        name: "Julien Bouquillon",
-        email: "contact@revolunet.com"
-      },
-      {
-        name: "Kevin Kwok",
-        email: "antimatter15@gmail.com"
-      },
-      {
-        name: "Kevin Lacker",
-        email: "lacker@gmail.com"
-      },
-      {
-        name: "Miguel Mota",
-        email: "miguelmota2@gmail.com"
-      },
-      {
-        name: "Nuno Nogueira",
-        email: "nunofmn@gmail.com"
-      },
-      {
-        name: "Philipp Muens",
-        email: "raute1337@gmx.de"
-      },
-      {
-        name: "RasmusErik Voel Jensen",
-        email: "github@solsort.com"
-      },
-      {
-        name: "Smite Chow",
-        email: "xiaopengyou@live.com"
-      },
-      {
-        name: "Soeren",
-        email: "nikorpoulsen@gmail.com"
-      },
-      {
-        name: "S\xF6nke Hahn",
-        email: "soenkehahn@gmail.com"
-      },
-      {
-        name: "TJKoury",
-        email: "TJKoury@gmail.com"
-      },
-      {
-        name: "Tiago Alves",
-        email: "alvesjtiago@gmail.com"
-      },
-      {
-        name: "Daijiro Wachi",
-        email: "daijiro.wachi@gmail.com"
-      },
-      {
-        name: "Cindy Wu",
-        email: "ciindy.wu@gmail.com"
-      },
-      {
-        name: "Chris Bratlien",
-        email: "chrisbratlien@gmail.com"
-      },
-      {
-        name: "Yusef Napora",
-        email: "yusef@napora.org"
-      },
-      {
-        name: "Zane Starr",
-        email: "zcstarr@gmail.com"
-      },
-      {
-        name: "Bernd Strehl",
-        email: "bernd.strehl@gmail.com"
-      },
-      {
-        name: "ebinks",
-        email: "elizabethjbinks@gmail.com"
-      },
-      {
-        name: "Ethan Lam",
-        email: "elmemphis2000@gmail.com"
-      },
-      {
-        name: "isan_rivkin",
-        email: "isanrivkin@gmail.com"
-      },
-      {
-        name: "robertkiel",
-        email: "robert.kiel@validitylabs.org"
-      },
-      {
-        name: "Aleksei",
-        email: "vozhdb@gmail.com"
-      },
-      {
-        name: "Fei Liu",
-        email: "liu.feiwood@gmail.com"
-      },
-      {
-        name: "Felipe Martins",
-        email: "felipebrasil93@gmail.com"
-      },
-      {
-        name: "Florian-Merle",
-        email: "florian.david.merle@gmail.com"
-      },
-      {
-        name: "Francis Gulotta",
-        email: "wizard@roborooter.com"
-      },
-      {
-        name: "Dmitriy Ryajov",
-        email: "dryajov@gmail.com"
-      },
-      {
-        name: "Henrique Dias",
-        email: "hacdias@gmail.com"
-      },
-      {
-        name: "Irakli Gozalishvili",
-        email: "rfobic@gmail.com"
-      },
-      {
-        name: "Diogo Silva",
-        email: "fsdiogo@gmail.com"
-      },
-      {
-        name: "Joel Gustafson",
-        email: "joelg@mit.edu"
-      }
-    ],
+    homepage: "https://libp2p.io",
+    license: "MIT",
+    engines: {
+      node: ">=12.0.0",
+      npm: ">=6.0.0"
+    },
+    browser: {
+      "@motrix/nat-api": false
+    },
     dependencies: {
       "@motrix/nat-api": "^0.3.1",
       "abort-controller": "^3.0.0",
@@ -79092,8 +78725,6 @@ var require_package4 = __commonJS((exports2, module2) => {
       varint: "^6.0.0",
       xsalsa20: "^1.0.2"
     },
-    deprecated: false,
-    description: "JavaScript implementation of libp2p, a modular peer to peer network stack",
     devDependencies: {
       "@nodeutils/defaults-deep": "^1.1.0",
       "@types/es6-promisify": "^6.0.0",
@@ -79131,53 +78762,62 @@ var require_package4 = __commonJS((exports2, module2) => {
       sinon: "^9.2.4",
       uint8arrays: "^2.0.5"
     },
-    engines: {
-      node: ">=12.0.0",
-      npm: ">=6.0.0"
-    },
-    files: [
-      "dist",
-      "src"
-    ],
-    homepage: "https://libp2p.io",
-    keywords: [
-      "libp2p",
-      "network",
-      "p2p",
-      "peer",
-      "peer-to-peer",
-      "IPFS"
-    ],
-    leadMaintainer: "Jacob Heun <jacobheun@gmail.com>",
-    license: "MIT",
-    main: "src/index.js",
-    name: "libp2p",
-    repository: {
-      type: "git",
-      url: "git+https://github.com/libp2p/js-libp2p.git"
-    },
-    scripts: {
-      build: "aegir build",
-      coverage: "nyc --reporter=text --reporter=lcov npm run test:node",
-      lint: "aegir lint",
-      release: "aegir release -t node -t browser",
-      "release-major": "aegir release --type major -t node -t browser",
-      "release-minor": "aegir release --type minor -t node -t browser",
-      test: "npm run test:node && npm run test:browser",
-      "test:browser": "aegir test -t browser",
-      "test:examples": "cd examples && npm run test:all",
-      "test:node": 'aegir test -t node -f "./test/**/*.{node,spec}.js"'
-    },
-    types: "dist/src/index.d.ts",
-    typesVersions: {
-      "*": {
-        "src/*": [
-          "dist/src/*",
-          "dist/src/*/index"
-        ]
-      }
-    },
-    version: "0.30.12"
+    contributors: [
+      "David Dias <daviddias.p@gmail.com>",
+      "Jacob Heun <jacobheun@gmail.com>",
+      "Vasco Santos <vasco.santos@moxy.studio>",
+      "Alan Shaw <alan@tableflip.io>",
+      "Alex Potsides <alex@achingbrain.net>",
+      "Cayman <caymannava@gmail.com>",
+      "Pedro Teixeira <i@pgte.me>",
+      "Friedel Ziegelmayer <dignifiedquire@gmail.com>",
+      "Maciej Kr\xFCger <mkg20001@gmail.com>",
+      "Hugo Dias <mail@hugodias.me>",
+      "Volker Mische <volker.mische@gmail.com>",
+      "dirkmc <dirkmdev@gmail.com>",
+      "Richard Littauer <richard.littauer@gmail.com>",
+      "a1300 <matthias-knopp@gmx.net>",
+      "Elven <mon.samuel@qq.com>",
+      "Andrew Nesbitt <andrewnez@gmail.com>",
+      "\u1D20\u026A\u1D04\u1D1B\u1D0F\u0280 \u0299\u1D0A\u1D07\u029F\u1D0B\u029C\u1D0F\u029F\u1D0D <victorbjelkholm@gmail.com>",
+      "Giovanni T. Parra <fiatjaf@gmail.com>",
+      "Ryan Bell <ryan@piing.net>",
+      "Thomas Eizinger <thomas@eizinger.io>",
+      "Samlior <samlior@foxmail.com>",
+      "Didrik Nordstr\xF6m <didrik@betamos.se>",
+      "Julien Bouquillon <contact@revolunet.com>",
+      "Kevin Kwok <antimatter15@gmail.com>",
+      "Kevin Lacker <lacker@gmail.com>",
+      "Miguel Mota <miguelmota2@gmail.com>",
+      "Nuno Nogueira <nunofmn@gmail.com>",
+      "Philipp Muens <raute1337@gmx.de>",
+      "RasmusErik Voel Jensen <github@solsort.com>",
+      "Smite Chow <xiaopengyou@live.com>",
+      "Soeren <nikorpoulsen@gmail.com>",
+      "S\xF6nke Hahn <soenkehahn@gmail.com>",
+      "TJKoury <TJKoury@gmail.com>",
+      "Tiago Alves <alvesjtiago@gmail.com>",
+      "Daijiro Wachi <daijiro.wachi@gmail.com>",
+      "Cindy Wu <ciindy.wu@gmail.com>",
+      "Chris Bratlien <chrisbratlien@gmail.com>",
+      "Yusef Napora <yusef@napora.org>",
+      "Zane Starr <zcstarr@gmail.com>",
+      "Bernd Strehl <bernd.strehl@gmail.com>",
+      "ebinks <elizabethjbinks@gmail.com>",
+      "Ethan Lam <elmemphis2000@gmail.com>",
+      "isan_rivkin <isanrivkin@gmail.com>",
+      "robertkiel <robert.kiel@validitylabs.org>",
+      "Aleksei <vozhdb@gmail.com>",
+      "Fei Liu <liu.feiwood@gmail.com>",
+      "Felipe Martins <felipebrasil93@gmail.com>",
+      "Florian-Merle <florian.david.merle@gmail.com>",
+      "Francis Gulotta <wizard@roborooter.com>",
+      "Dmitriy Ryajov <dryajov@gmail.com>",
+      "Henrique Dias <hacdias@gmail.com>",
+      "Irakli Gozalishvili <rfobic@gmail.com>",
+      "Diogo Silva <fsdiogo@gmail.com>",
+      "Joel Gustafson <joelg@mit.edu>"
+    ]
   };
 });
 
@@ -79398,14 +79038,760 @@ var require_netmask = __commonJS((exports2) => {
   }).call(exports2);
 });
 
+// node_modules/ipaddr.js/lib/ipaddr.js
+var require_ipaddr = __commonJS((exports2, module2) => {
+  (function(root) {
+    "use strict";
+    const ipv4Part = "(0?\\d+|0x[a-f0-9]+)";
+    const ipv4Regexes = {
+      fourOctet: new RegExp(`^${ipv4Part}\\.${ipv4Part}\\.${ipv4Part}\\.${ipv4Part}$`, "i"),
+      threeOctet: new RegExp(`^${ipv4Part}\\.${ipv4Part}\\.${ipv4Part}$`, "i"),
+      twoOctet: new RegExp(`^${ipv4Part}\\.${ipv4Part}$`, "i"),
+      longValue: new RegExp(`^${ipv4Part}$`, "i")
+    };
+    const octalRegex = new RegExp(`^0[0-7]+$`, "i");
+    const hexRegex = new RegExp(`^0x[a-f0-9]+$`, "i");
+    const zoneIndex = "%[0-9a-z]{1,}";
+    const ipv6Part = "(?:[0-9a-f]+::?)+";
+    const ipv6Regexes = {
+      zoneIndex: new RegExp(zoneIndex, "i"),
+      native: new RegExp(`^(::)?(${ipv6Part})?([0-9a-f]+)?(::)?(${zoneIndex})?$`, "i"),
+      deprecatedTransitional: new RegExp(`^(?:::)(${ipv4Part}\\.${ipv4Part}\\.${ipv4Part}\\.${ipv4Part}(${zoneIndex})?)$`, "i"),
+      transitional: new RegExp(`^((?:${ipv6Part})|(?:::)(?:${ipv6Part})?)${ipv4Part}\\.${ipv4Part}\\.${ipv4Part}\\.${ipv4Part}(${zoneIndex})?$`, "i")
+    };
+    function expandIPv6(string, parts) {
+      if (string.indexOf("::") !== string.lastIndexOf("::")) {
+        return null;
+      }
+      let colonCount = 0;
+      let lastColon = -1;
+      let zoneId = (string.match(ipv6Regexes.zoneIndex) || [])[0];
+      let replacement, replacementCount;
+      if (zoneId) {
+        zoneId = zoneId.substring(1);
+        string = string.replace(/%.+$/, "");
+      }
+      while ((lastColon = string.indexOf(":", lastColon + 1)) >= 0) {
+        colonCount++;
+      }
+      if (string.substr(0, 2) === "::") {
+        colonCount--;
+      }
+      if (string.substr(-2, 2) === "::") {
+        colonCount--;
+      }
+      if (colonCount > parts) {
+        return null;
+      }
+      replacementCount = parts - colonCount;
+      replacement = ":";
+      while (replacementCount--) {
+        replacement += "0:";
+      }
+      string = string.replace("::", replacement);
+      if (string[0] === ":") {
+        string = string.slice(1);
+      }
+      if (string[string.length - 1] === ":") {
+        string = string.slice(0, -1);
+      }
+      parts = function() {
+        const ref = string.split(":");
+        const results = [];
+        for (let i = 0; i < ref.length; i++) {
+          results.push(parseInt(ref[i], 16));
+        }
+        return results;
+      }();
+      return {
+        parts,
+        zoneId
+      };
+    }
+    function matchCIDR(first, second, partSize, cidrBits) {
+      if (first.length !== second.length) {
+        throw new Error("ipaddr: cannot match CIDR for objects with different lengths");
+      }
+      let part = 0;
+      let shift;
+      while (cidrBits > 0) {
+        shift = partSize - cidrBits;
+        if (shift < 0) {
+          shift = 0;
+        }
+        if (first[part] >> shift !== second[part] >> shift) {
+          return false;
+        }
+        cidrBits -= partSize;
+        part += 1;
+      }
+      return true;
+    }
+    function parseIntAuto(string) {
+      if (hexRegex.test(string)) {
+        return parseInt(string, 16);
+      }
+      if (string[0] === "0" && !isNaN(parseInt(string[1], 10))) {
+        if (octalRegex.test(string)) {
+          return parseInt(string, 8);
+        }
+        throw new Error(`ipaddr: cannot parse ${string} as octal`);
+      }
+      return parseInt(string, 10);
+    }
+    function padPart(part, length) {
+      while (part.length < length) {
+        part = `0${part}`;
+      }
+      return part;
+    }
+    const ipaddr = {};
+    ipaddr.IPv4 = function() {
+      function IPv4(octets) {
+        if (octets.length !== 4) {
+          throw new Error("ipaddr: ipv4 octet count should be 4");
+        }
+        let i, octet;
+        for (i = 0; i < octets.length; i++) {
+          octet = octets[i];
+          if (!(0 <= octet && octet <= 255)) {
+            throw new Error("ipaddr: ipv4 octet should fit in 8 bits");
+          }
+        }
+        this.octets = octets;
+      }
+      IPv4.prototype.SpecialRanges = {
+        unspecified: [[new IPv4([0, 0, 0, 0]), 8]],
+        broadcast: [[new IPv4([255, 255, 255, 255]), 32]],
+        multicast: [[new IPv4([224, 0, 0, 0]), 4]],
+        linkLocal: [[new IPv4([169, 254, 0, 0]), 16]],
+        loopback: [[new IPv4([127, 0, 0, 0]), 8]],
+        carrierGradeNat: [[new IPv4([100, 64, 0, 0]), 10]],
+        private: [
+          [new IPv4([10, 0, 0, 0]), 8],
+          [new IPv4([172, 16, 0, 0]), 12],
+          [new IPv4([192, 168, 0, 0]), 16]
+        ],
+        reserved: [
+          [new IPv4([192, 0, 0, 0]), 24],
+          [new IPv4([192, 0, 2, 0]), 24],
+          [new IPv4([192, 88, 99, 0]), 24],
+          [new IPv4([198, 51, 100, 0]), 24],
+          [new IPv4([203, 0, 113, 0]), 24],
+          [new IPv4([240, 0, 0, 0]), 4]
+        ]
+      };
+      IPv4.prototype.kind = function() {
+        return "ipv4";
+      };
+      IPv4.prototype.match = function(other, cidrRange) {
+        let ref;
+        if (cidrRange === void 0) {
+          ref = other;
+          other = ref[0];
+          cidrRange = ref[1];
+        }
+        if (other.kind() !== "ipv4") {
+          throw new Error("ipaddr: cannot match ipv4 address with non-ipv4 one");
+        }
+        return matchCIDR(this.octets, other.octets, 8, cidrRange);
+      };
+      IPv4.prototype.prefixLengthFromSubnetMask = function() {
+        let cidr = 0;
+        let stop = false;
+        const zerotable = {
+          0: 8,
+          128: 7,
+          192: 6,
+          224: 5,
+          240: 4,
+          248: 3,
+          252: 2,
+          254: 1,
+          255: 0
+        };
+        let i, octet, zeros;
+        for (i = 3; i >= 0; i -= 1) {
+          octet = this.octets[i];
+          if (octet in zerotable) {
+            zeros = zerotable[octet];
+            if (stop && zeros !== 0) {
+              return null;
+            }
+            if (zeros !== 8) {
+              stop = true;
+            }
+            cidr += zeros;
+          } else {
+            return null;
+          }
+        }
+        return 32 - cidr;
+      };
+      IPv4.prototype.range = function() {
+        return ipaddr.subnetMatch(this, this.SpecialRanges);
+      };
+      IPv4.prototype.toByteArray = function() {
+        return this.octets.slice(0);
+      };
+      IPv4.prototype.toIPv4MappedAddress = function() {
+        return ipaddr.IPv6.parse(`::ffff:${this.toString()}`);
+      };
+      IPv4.prototype.toNormalizedString = function() {
+        return this.toString();
+      };
+      IPv4.prototype.toString = function() {
+        return this.octets.join(".");
+      };
+      return IPv4;
+    }();
+    ipaddr.IPv4.broadcastAddressFromCIDR = function(string) {
+      try {
+        const cidr = this.parseCIDR(string);
+        const ipInterfaceOctets = cidr[0].toByteArray();
+        const subnetMaskOctets = this.subnetMaskFromPrefixLength(cidr[1]).toByteArray();
+        const octets = [];
+        let i = 0;
+        while (i < 4) {
+          octets.push(parseInt(ipInterfaceOctets[i], 10) | parseInt(subnetMaskOctets[i], 10) ^ 255);
+          i++;
+        }
+        return new this(octets);
+      } catch (e) {
+        throw new Error("ipaddr: the address does not have IPv4 CIDR format");
+      }
+    };
+    ipaddr.IPv4.isIPv4 = function(string) {
+      return this.parser(string) !== null;
+    };
+    ipaddr.IPv4.isValid = function(string) {
+      try {
+        new this(this.parser(string));
+        return true;
+      } catch (e) {
+        return false;
+      }
+    };
+    ipaddr.IPv4.isValidFourPartDecimal = function(string) {
+      if (ipaddr.IPv4.isValid(string) && string.match(/^(0|[1-9]\d*)(\.(0|[1-9]\d*)){3}$/)) {
+        return true;
+      } else {
+        return false;
+      }
+    };
+    ipaddr.IPv4.networkAddressFromCIDR = function(string) {
+      let cidr, i, ipInterfaceOctets, octets, subnetMaskOctets;
+      try {
+        cidr = this.parseCIDR(string);
+        ipInterfaceOctets = cidr[0].toByteArray();
+        subnetMaskOctets = this.subnetMaskFromPrefixLength(cidr[1]).toByteArray();
+        octets = [];
+        i = 0;
+        while (i < 4) {
+          octets.push(parseInt(ipInterfaceOctets[i], 10) & parseInt(subnetMaskOctets[i], 10));
+          i++;
+        }
+        return new this(octets);
+      } catch (e) {
+        throw new Error("ipaddr: the address does not have IPv4 CIDR format");
+      }
+    };
+    ipaddr.IPv4.parse = function(string) {
+      const parts = this.parser(string);
+      if (parts === null) {
+        throw new Error("ipaddr: string is not formatted like an IPv4 Address");
+      }
+      return new this(parts);
+    };
+    ipaddr.IPv4.parseCIDR = function(string) {
+      let match;
+      if (match = string.match(/^(.+)\/(\d+)$/)) {
+        const maskLength = parseInt(match[2]);
+        if (maskLength >= 0 && maskLength <= 32) {
+          const parsed = [this.parse(match[1]), maskLength];
+          Object.defineProperty(parsed, "toString", {
+            value: function() {
+              return this.join("/");
+            }
+          });
+          return parsed;
+        }
+      }
+      throw new Error("ipaddr: string is not formatted like an IPv4 CIDR range");
+    };
+    ipaddr.IPv4.parser = function(string) {
+      let match, part, value;
+      if (match = string.match(ipv4Regexes.fourOctet)) {
+        return function() {
+          const ref = match.slice(1, 6);
+          const results = [];
+          for (let i = 0; i < ref.length; i++) {
+            part = ref[i];
+            results.push(parseIntAuto(part));
+          }
+          return results;
+        }();
+      } else if (match = string.match(ipv4Regexes.longValue)) {
+        value = parseIntAuto(match[1]);
+        if (value > 4294967295 || value < 0) {
+          throw new Error("ipaddr: address outside defined range");
+        }
+        return function() {
+          const results = [];
+          let shift;
+          for (shift = 0; shift <= 24; shift += 8) {
+            results.push(value >> shift & 255);
+          }
+          return results;
+        }().reverse();
+      } else if (match = string.match(ipv4Regexes.twoOctet)) {
+        return function() {
+          const ref = match.slice(1, 4);
+          const results = [];
+          value = parseIntAuto(ref[1]);
+          if (value > 16777215 || value < 0) {
+            throw new Error("ipaddr: address outside defined range");
+          }
+          results.push(parseIntAuto(ref[0]));
+          results.push(value >> 16 & 255);
+          results.push(value >> 8 & 255);
+          results.push(value & 255);
+          return results;
+        }();
+      } else if (match = string.match(ipv4Regexes.threeOctet)) {
+        return function() {
+          const ref = match.slice(1, 5);
+          const results = [];
+          value = parseIntAuto(ref[2]);
+          if (value > 65535 || value < 0) {
+            throw new Error("ipaddr: address outside defined range");
+          }
+          results.push(parseIntAuto(ref[0]));
+          results.push(parseIntAuto(ref[1]));
+          results.push(value >> 8 & 255);
+          results.push(value & 255);
+          return results;
+        }();
+      } else {
+        return null;
+      }
+    };
+    ipaddr.IPv4.subnetMaskFromPrefixLength = function(prefix) {
+      prefix = parseInt(prefix);
+      if (prefix < 0 || prefix > 32) {
+        throw new Error("ipaddr: invalid IPv4 prefix length");
+      }
+      const octets = [0, 0, 0, 0];
+      let j = 0;
+      const filledOctetCount = Math.floor(prefix / 8);
+      while (j < filledOctetCount) {
+        octets[j] = 255;
+        j++;
+      }
+      if (filledOctetCount < 4) {
+        octets[filledOctetCount] = Math.pow(2, prefix % 8) - 1 << 8 - prefix % 8;
+      }
+      return new this(octets);
+    };
+    ipaddr.IPv6 = function() {
+      function IPv6(parts, zoneId) {
+        let i, part;
+        if (parts.length === 16) {
+          this.parts = [];
+          for (i = 0; i <= 14; i += 2) {
+            this.parts.push(parts[i] << 8 | parts[i + 1]);
+          }
+        } else if (parts.length === 8) {
+          this.parts = parts;
+        } else {
+          throw new Error("ipaddr: ipv6 part count should be 8 or 16");
+        }
+        for (i = 0; i < this.parts.length; i++) {
+          part = this.parts[i];
+          if (!(0 <= part && part <= 65535)) {
+            throw new Error("ipaddr: ipv6 part should fit in 16 bits");
+          }
+        }
+        if (zoneId) {
+          this.zoneId = zoneId;
+        }
+      }
+      IPv6.prototype.SpecialRanges = {
+        unspecified: [new IPv6([0, 0, 0, 0, 0, 0, 0, 0]), 128],
+        linkLocal: [new IPv6([65152, 0, 0, 0, 0, 0, 0, 0]), 10],
+        multicast: [new IPv6([65280, 0, 0, 0, 0, 0, 0, 0]), 8],
+        loopback: [new IPv6([0, 0, 0, 0, 0, 0, 0, 1]), 128],
+        uniqueLocal: [new IPv6([64512, 0, 0, 0, 0, 0, 0, 0]), 7],
+        ipv4Mapped: [new IPv6([0, 0, 0, 0, 0, 65535, 0, 0]), 96],
+        rfc6145: [new IPv6([0, 0, 0, 0, 65535, 0, 0, 0]), 96],
+        rfc6052: [new IPv6([100, 65435, 0, 0, 0, 0, 0, 0]), 96],
+        "6to4": [new IPv6([8194, 0, 0, 0, 0, 0, 0, 0]), 16],
+        teredo: [new IPv6([8193, 0, 0, 0, 0, 0, 0, 0]), 32],
+        reserved: [[new IPv6([8193, 3512, 0, 0, 0, 0, 0, 0]), 32]]
+      };
+      IPv6.prototype.isIPv4MappedAddress = function() {
+        return this.range() === "ipv4Mapped";
+      };
+      IPv6.prototype.kind = function() {
+        return "ipv6";
+      };
+      IPv6.prototype.match = function(other, cidrRange) {
+        let ref;
+        if (cidrRange === void 0) {
+          ref = other;
+          other = ref[0];
+          cidrRange = ref[1];
+        }
+        if (other.kind() !== "ipv6") {
+          throw new Error("ipaddr: cannot match ipv6 address with non-ipv6 one");
+        }
+        return matchCIDR(this.parts, other.parts, 16, cidrRange);
+      };
+      IPv6.prototype.prefixLengthFromSubnetMask = function() {
+        let cidr = 0;
+        let stop = false;
+        const zerotable = {
+          0: 16,
+          32768: 15,
+          49152: 14,
+          57344: 13,
+          61440: 12,
+          63488: 11,
+          64512: 10,
+          65024: 9,
+          65280: 8,
+          65408: 7,
+          65472: 6,
+          65504: 5,
+          65520: 4,
+          65528: 3,
+          65532: 2,
+          65534: 1,
+          65535: 0
+        };
+        let part, zeros;
+        for (let i = 7; i >= 0; i -= 1) {
+          part = this.parts[i];
+          if (part in zerotable) {
+            zeros = zerotable[part];
+            if (stop && zeros !== 0) {
+              return null;
+            }
+            if (zeros !== 16) {
+              stop = true;
+            }
+            cidr += zeros;
+          } else {
+            return null;
+          }
+        }
+        return 128 - cidr;
+      };
+      IPv6.prototype.range = function() {
+        return ipaddr.subnetMatch(this, this.SpecialRanges);
+      };
+      IPv6.prototype.toByteArray = function() {
+        let part;
+        const bytes = [];
+        const ref = this.parts;
+        for (let i = 0; i < ref.length; i++) {
+          part = ref[i];
+          bytes.push(part >> 8);
+          bytes.push(part & 255);
+        }
+        return bytes;
+      };
+      IPv6.prototype.toFixedLengthString = function() {
+        const addr = function() {
+          const results = [];
+          for (let i = 0; i < this.parts.length; i++) {
+            results.push(padPart(this.parts[i].toString(16), 4));
+          }
+          return results;
+        }.call(this).join(":");
+        let suffix = "";
+        if (this.zoneId) {
+          suffix = `%${this.zoneId}`;
+        }
+        return addr + suffix;
+      };
+      IPv6.prototype.toIPv4Address = function() {
+        if (!this.isIPv4MappedAddress()) {
+          throw new Error("ipaddr: trying to convert a generic ipv6 address to ipv4");
+        }
+        const ref = this.parts.slice(-2);
+        const high = ref[0];
+        const low = ref[1];
+        return new ipaddr.IPv4([high >> 8, high & 255, low >> 8, low & 255]);
+      };
+      IPv6.prototype.toNormalizedString = function() {
+        const addr = function() {
+          const results = [];
+          for (let i = 0; i < this.parts.length; i++) {
+            results.push(this.parts[i].toString(16));
+          }
+          return results;
+        }.call(this).join(":");
+        let suffix = "";
+        if (this.zoneId) {
+          suffix = `%${this.zoneId}`;
+        }
+        return addr + suffix;
+      };
+      IPv6.prototype.toRFC5952String = function() {
+        const regex = /((^|:)(0(:|$)){2,})/g;
+        const string = this.toNormalizedString();
+        let bestMatchIndex = 0;
+        let bestMatchLength = -1;
+        let match;
+        while (match = regex.exec(string)) {
+          if (match[0].length > bestMatchLength) {
+            bestMatchIndex = match.index;
+            bestMatchLength = match[0].length;
+          }
+        }
+        if (bestMatchLength < 0) {
+          return string;
+        }
+        return `${string.substring(0, bestMatchIndex)}::${string.substring(bestMatchIndex + bestMatchLength)}`;
+      };
+      IPv6.prototype.toString = function() {
+        return this.toNormalizedString().replace(/((^|:)(0(:|$))+)/, "::");
+      };
+      return IPv6;
+    }();
+    ipaddr.IPv6.broadcastAddressFromCIDR = function(string) {
+      try {
+        const cidr = this.parseCIDR(string);
+        const ipInterfaceOctets = cidr[0].toByteArray();
+        const subnetMaskOctets = this.subnetMaskFromPrefixLength(cidr[1]).toByteArray();
+        const octets = [];
+        let i = 0;
+        while (i < 16) {
+          octets.push(parseInt(ipInterfaceOctets[i], 10) | parseInt(subnetMaskOctets[i], 10) ^ 255);
+          i++;
+        }
+        return new this(octets);
+      } catch (e) {
+        throw new Error(`ipaddr: the address does not have IPv6 CIDR format (${e})`);
+      }
+    };
+    ipaddr.IPv6.isIPv6 = function(string) {
+      return this.parser(string) !== null;
+    };
+    ipaddr.IPv6.isValid = function(string) {
+      if (typeof string === "string" && string.indexOf(":") === -1) {
+        return false;
+      }
+      try {
+        const addr = this.parser(string);
+        new this(addr.parts, addr.zoneId);
+        return true;
+      } catch (e) {
+        return false;
+      }
+    };
+    ipaddr.IPv6.networkAddressFromCIDR = function(string) {
+      let cidr, i, ipInterfaceOctets, octets, subnetMaskOctets;
+      try {
+        cidr = this.parseCIDR(string);
+        ipInterfaceOctets = cidr[0].toByteArray();
+        subnetMaskOctets = this.subnetMaskFromPrefixLength(cidr[1]).toByteArray();
+        octets = [];
+        i = 0;
+        while (i < 16) {
+          octets.push(parseInt(ipInterfaceOctets[i], 10) & parseInt(subnetMaskOctets[i], 10));
+          i++;
+        }
+        return new this(octets);
+      } catch (e) {
+        throw new Error(`ipaddr: the address does not have IPv6 CIDR format (${e})`);
+      }
+    };
+    ipaddr.IPv6.parse = function(string) {
+      const addr = this.parser(string);
+      if (addr.parts === null) {
+        throw new Error("ipaddr: string is not formatted like an IPv6 Address");
+      }
+      return new this(addr.parts, addr.zoneId);
+    };
+    ipaddr.IPv6.parseCIDR = function(string) {
+      let maskLength, match, parsed;
+      if (match = string.match(/^(.+)\/(\d+)$/)) {
+        maskLength = parseInt(match[2]);
+        if (maskLength >= 0 && maskLength <= 128) {
+          parsed = [this.parse(match[1]), maskLength];
+          Object.defineProperty(parsed, "toString", {
+            value: function() {
+              return this.join("/");
+            }
+          });
+          return parsed;
+        }
+      }
+      throw new Error("ipaddr: string is not formatted like an IPv6 CIDR range");
+    };
+    ipaddr.IPv6.parser = function(string) {
+      let addr, i, match, octet, octets, zoneId;
+      if (match = string.match(ipv6Regexes.deprecatedTransitional)) {
+        return this.parser(`::ffff:${match[1]}`);
+      }
+      if (ipv6Regexes.native.test(string)) {
+        return expandIPv6(string, 8);
+      }
+      if (match = string.match(ipv6Regexes.transitional)) {
+        zoneId = match[6] || "";
+        addr = expandIPv6(match[1].slice(0, -1) + zoneId, 6);
+        if (addr.parts) {
+          octets = [
+            parseInt(match[2]),
+            parseInt(match[3]),
+            parseInt(match[4]),
+            parseInt(match[5])
+          ];
+          for (i = 0; i < octets.length; i++) {
+            octet = octets[i];
+            if (!(0 <= octet && octet <= 255)) {
+              return null;
+            }
+          }
+          addr.parts.push(octets[0] << 8 | octets[1]);
+          addr.parts.push(octets[2] << 8 | octets[3]);
+          return {
+            parts: addr.parts,
+            zoneId: addr.zoneId
+          };
+        }
+      }
+      return null;
+    };
+    ipaddr.IPv6.subnetMaskFromPrefixLength = function(prefix) {
+      prefix = parseInt(prefix);
+      if (prefix < 0 || prefix > 128) {
+        throw new Error("ipaddr: invalid IPv6 prefix length");
+      }
+      const octets = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+      let j = 0;
+      const filledOctetCount = Math.floor(prefix / 8);
+      while (j < filledOctetCount) {
+        octets[j] = 255;
+        j++;
+      }
+      if (filledOctetCount < 16) {
+        octets[filledOctetCount] = Math.pow(2, prefix % 8) - 1 << 8 - prefix % 8;
+      }
+      return new this(octets);
+    };
+    ipaddr.fromByteArray = function(bytes) {
+      const length = bytes.length;
+      if (length === 4) {
+        return new ipaddr.IPv4(bytes);
+      } else if (length === 16) {
+        return new ipaddr.IPv6(bytes);
+      } else {
+        throw new Error("ipaddr: the binary input is neither an IPv6 nor IPv4 address");
+      }
+    };
+    ipaddr.isValid = function(string) {
+      return ipaddr.IPv6.isValid(string) || ipaddr.IPv4.isValid(string);
+    };
+    ipaddr.parse = function(string) {
+      if (ipaddr.IPv6.isValid(string)) {
+        return ipaddr.IPv6.parse(string);
+      } else if (ipaddr.IPv4.isValid(string)) {
+        return ipaddr.IPv4.parse(string);
+      } else {
+        throw new Error("ipaddr: the address has neither IPv6 nor IPv4 format");
+      }
+    };
+    ipaddr.parseCIDR = function(string) {
+      try {
+        return ipaddr.IPv6.parseCIDR(string);
+      } catch (e) {
+        try {
+          return ipaddr.IPv4.parseCIDR(string);
+        } catch (e2) {
+          throw new Error("ipaddr: the address has neither IPv6 nor IPv4 CIDR format");
+        }
+      }
+    };
+    ipaddr.process = function(string) {
+      const addr = this.parse(string);
+      if (addr.kind() === "ipv6" && addr.isIPv4MappedAddress()) {
+        return addr.toIPv4Address();
+      } else {
+        return addr;
+      }
+    };
+    ipaddr.subnetMatch = function(address, rangeList, defaultName) {
+      let i, rangeName, rangeSubnets, subnet;
+      if (defaultName === void 0 || defaultName === null) {
+        defaultName = "unicast";
+      }
+      for (rangeName in rangeList) {
+        if (Object.prototype.hasOwnProperty.call(rangeList, rangeName)) {
+          rangeSubnets = rangeList[rangeName];
+          if (rangeSubnets[0] && !(rangeSubnets[0] instanceof Array)) {
+            rangeSubnets = [rangeSubnets];
+          }
+          for (i = 0; i < rangeSubnets.length; i++) {
+            subnet = rangeSubnets[i];
+            if (address.kind() === subnet[0].kind() && address.match.apply(address, subnet)) {
+              return rangeName;
+            }
+          }
+        }
+      }
+      return defaultName;
+    };
+    if (typeof module2 !== "undefined" && module2.exports) {
+      module2.exports = ipaddr;
+    } else {
+      root.ipaddr = ipaddr;
+    }
+  })(exports2);
+});
+
 // node_modules/private-ip/lib/index.js
-var require_lib7 = __commonJS((exports2, module2) => {
-  var Netmask = require_netmask().Netmask;
-  var ip_regex = require_ip_regex();
-  var PRIVATE_IP_RANGES = ["0.0.0.0/8", "10.0.0.0/8", "100.64.0.0/10", "127.0.0.0/8", "169.254.0.0/16", "172.16.0.0/12", "192.0.0.0/24", "192.0.0.0/29", "192.0.0.8/32", "192.0.0.9/32", "192.0.0.10/32", "192.0.0.170/32", "192.0.0.171/32", "192.0.2.0/24", "192.31.196.0/24", "192.52.193.0/24", "192.88.99.0/24", "192.168.0.0/16", "192.175.48.0/24", "198.18.0.0/15", "198.51.100.0/24", "203.0.113.0/24", "240.0.0.0/4", "255.255.255.255/32"];
+var require_lib7 = __commonJS((exports2) => {
+  "use strict";
+  var __importDefault = exports2 && exports2.__importDefault || function(mod) {
+    return mod && mod.__esModule ? mod : {default: mod};
+  };
+  Object.defineProperty(exports2, "__esModule", {value: true});
+  var netmask_1 = require_netmask();
+  var ip_regex_1 = __importDefault(require_ip_regex());
+  var is_ip_1 = __importDefault(require_is_ip());
+  var ipaddr_js_1 = require_ipaddr();
+  var PRIVATE_IP_RANGES = [
+    "0.0.0.0/8",
+    "10.0.0.0/8",
+    "100.64.0.0/10",
+    "127.0.0.0/8",
+    "169.254.0.0/16",
+    "172.16.0.0/12",
+    "192.0.0.0/24",
+    "192.0.0.0/29",
+    "192.0.0.8/32",
+    "192.0.0.9/32",
+    "192.0.0.10/32",
+    "192.0.0.170/32",
+    "192.0.0.171/32",
+    "192.0.2.0/24",
+    "192.31.196.0/24",
+    "192.52.193.0/24",
+    "192.88.99.0/24",
+    "192.168.0.0/16",
+    "192.175.48.0/24",
+    "198.18.0.0/15",
+    "198.51.100.0/24",
+    "203.0.113.0/24",
+    "240.0.0.0/4",
+    "255.255.255.255/32"
+  ];
+  var NETMASK_RANGES = PRIVATE_IP_RANGES.map((ip_range) => new netmask_1.Netmask(ip_range));
   function ipv4_check(ip_addr) {
-    const blocks = [...PRIVATE_IP_RANGES].map((ip_range) => new Netmask(ip_range));
-    for (let r of blocks) {
+    for (let r of NETMASK_RANGES) {
       if (r.contains(ip_addr))
         return true;
     }
@@ -79414,19 +79800,23 @@ var require_lib7 = __commonJS((exports2, module2) => {
   function ipv6_check(ip_addr) {
     return /^::$/.test(ip_addr) || /^::1$/.test(ip_addr) || /^::f{4}:([0-9]{1,3})\.([0-9]{1,3})\.([0-9]{1,3})\.([0-9]{1,3})$/.test(ip_addr) || /^::f{4}:0.([0-9]{1,3})\.([0-9]{1,3})\.([0-9]{1,3})\.([0-9]{1,3})$/.test(ip_addr) || /^64:ff9b::([0-9]{1,3})\.([0-9]{1,3})\.([0-9]{1,3})\.([0-9]{1,3})$/.test(ip_addr) || /^100::([0-9a-fA-F]{0,4}):?([0-9a-fA-F]{0,4}):?([0-9a-fA-F]{0,4}):?([0-9a-fA-F]{0,4})$/.test(ip_addr) || /^2001::([0-9a-fA-F]{0,4}):?([0-9a-fA-F]{0,4}):?([0-9a-fA-F]{0,4}):?([0-9a-fA-F]{0,4}):?([0-9a-fA-F]{0,4}):?([0-9a-fA-F]{0,4})$/.test(ip_addr) || /^2001:2[0-9a-fA-F]:([0-9a-fA-F]{0,4}):?([0-9a-fA-F]{0,4}):?([0-9a-fA-F]{0,4}):?([0-9a-fA-F]{0,4}):?([0-9a-fA-F]{0,4}):?([0-9a-fA-F]{0,4})$/.test(ip_addr) || /^2001:db8:([0-9a-fA-F]{0,4}):?([0-9a-fA-F]{0,4}):?([0-9a-fA-F]{0,4}):?([0-9a-fA-F]{0,4}):?([0-9a-fA-F]{0,4}):?([0-9a-fA-F]{0,4})$/.test(ip_addr) || /^2002:([0-9a-fA-F]{0,4}):?([0-9a-fA-F]{0,4}):?([0-9a-fA-F]{0,4}):?([0-9a-fA-F]{0,4}):?([0-9a-fA-F]{0,4}):?([0-9a-fA-F]{0,4}):?([0-9a-fA-F]{0,4})$/.test(ip_addr) || /^f[c-d]([0-9a-fA-F]{2,2}):/i.test(ip_addr) || /^fe[8-9a-bA-B][0-9a-fA-F]:/i.test(ip_addr) || /^ff([0-9a-fA-F]{2,2}):/i.test(ip_addr);
   }
-  module2.exports = (ip_addr) => {
-    if (ip_regex.v6().test(ip_addr))
-      return ipv6_check(ip_addr);
-    else if (ip_regex().test(ip_addr) || ip_addr.startsWith("0"))
-      return ipv4_check(ip_addr);
-    return false;
+  exports2.default = (ip) => {
+    if (ipaddr_js_1.isValid(ip)) {
+      const parsed = ipaddr_js_1.parse(ip);
+      if (parsed.kind() === "ipv4")
+        return ipv4_check(parsed.toNormalizedString());
+      else if (parsed.kind() === "ipv6")
+        return ipv6_check(ip);
+    } else if (is_ip_1.default(ip) && ip_regex_1.default.v6().test(ip))
+      return ipv6_check(ip);
+    return void 0;
   };
 });
 
 // node_modules/private-ip/index.js
 var require_private_ip = __commonJS((exports2, module2) => {
   "use strict";
-  module2.exports = require_lib7();
+  module2.exports = require_lib7().default;
 });
 
 // node_modules/libp2p-utils/src/multiaddr/is-private.js
@@ -123773,6 +124163,6 @@ if (globalThis && globalThis.process && globalThis.process.env)
   globalThis.process.env.LIBP2P_FORCE_PNET = false;
 
 // node_modules/nanoid/url-alphabet/index.js
-var urlAlphabet = "ModuleSymbhasOwnPr-0123456789ABCDEFGHNRVfgctiUvz_KqYTJkLxpZXIjQW";
+var urlAlphabet = "useandom-26T198340PX75pxJACKVERYMINDBUSHWOLF_GQZbfghjklqvwyzrict";
 export default require_src74();
 //# sourceMappingURL=index.js.map
